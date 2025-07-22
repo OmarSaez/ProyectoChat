@@ -13,7 +13,7 @@ func GetChat(c *gin.Context) {
 	resultado := database.DB.Find(&chats)
 
 	if resultado.Error != nil {
-		c.JSON(500, gin.H{"error": resultado.Error.Error()})
+		c.JSON(404, gin.H{"error": resultado.Error.Error()})
 		return
 	}
 

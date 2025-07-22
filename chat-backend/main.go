@@ -25,6 +25,7 @@ func main() {
 
 	routes.UserRouter(api)
 	routes.ChatRouter(api)
+	routes.GrupoRouter(api)
 
 	r.Run(":8080") // Servidor en localhost:8080
 }
