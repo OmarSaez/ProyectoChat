@@ -13,5 +13,5 @@ func UserRouter(r *gin.RouterGroup) {
 	r.PUT("/usuario/:id", controllers.ActualizarUsuario)
 	r.DELETE("/usuario/:id", controllers.EliminarUsuario)
 	r.POST("/usuario/login", controllers.Login)
-
+	r.POST("/usuario/:nombre", controllers.BuscarNombre)
 }

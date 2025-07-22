@@ -141,3 +141,21 @@ func Login(c *gin.Context) {
 		"usuario": usuario,
 	})
 }
+
+func BuscarNombre(c *gin.Context) {
+	nombre := c.Param("nombre")
+	patron := "%" + nombre + "%" // busca el nombre en cualquier parte del string
+
+	var buscarUsuario []models.Usuario
+
+	result := database.DB.
+		Where("LOWER(nombre) LIKE LOWER(?)", patron). // LOWER(username) LIKE LOWER(?) fuerza ambos lados a minúsculas para que no importe si el nombre tiene mayúsculas.
+		Find(&buscarUsuario)
+
+	if result.Error != nil {
+		c.JSON(500, gin.H{"error": "No se encontraron usuarios"})
+		return
+	}
+
+	c.JSON(200, buscarUsuario)
+}
