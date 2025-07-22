@@ -13,6 +13,7 @@ func SetupRouter() *gin.Engine {
 	r.POST("/usuarios", controllers.CrearUsuario)
 	r.PUT("/usuarios/:id", controllers.ActualizarUsuario)
 	r.DELETE("/usuarios/:id", controllers.EliminarUsuario)
+	r.POST("/usuarios/login", controllers.Login)
 
 	return r
 }

@@ -4,10 +4,13 @@ import (
 	"net/http"
 
 	"chat-backend/database"
+	"chat-backend/dto"
 	"chat-backend/models"
+	"chat-backend/service"
 
 	"github.com/gin-gonic/gin"
 
+	"fmt"
 	"strconv"
 )
 
@@ -28,20 +31,40 @@ func GetUsuarios(c *gin.Context) {
 func CrearUsuario(c *gin.Context) {
 	var nuevoUsuario models.Usuario
 
-	// 1. Leer el JSON del body y convertirlo a la struct Usuario
+	// Leer el JSON del body y convertirlo a la struct Usuario
 	if err := c.ShouldBindJSON(&nuevoUsuario); err != nil {
 		c.JSON(400, gin.H{"error": "JSON malformado: " + err.Error()})
 		return
 	}
 
-	// 2. Guardar en la base de datos
+	// Verifico que el email no exista
+	err := service.VerificarEmail(database.DB, nuevoUsuario.Email)
+	if err != nil {
+		fmt.Println("Error:", err.Error())
+		c.JSON(400, gin.H{"error": "Error: " + err.Error()}) // Se detiene la creacion y se indica error
+		return
+	} else {
+		fmt.Println("Correo válida")
+	}
+
+	// Verifico que la contrasena sea valida
+	err = service.ValidarContrasena(nuevoUsuario.Contrasena)
+	if err != nil {
+		fmt.Println("Error:", err.Error())
+		c.JSON(400, gin.H{"error": "Error: " + err.Error()}) // Se detiene la creacion y se indica error
+		return
+	} else {
+		fmt.Println("Contraseña valida")
+	}
+
+	// Guardar en la base de datos
 	result := database.DB.Create(&nuevoUsuario)
 	if result.Error != nil {
 		c.JSON(500, gin.H{"error": "Error al guardar en base de datos: " + result.Error.Error()})
 		return
 	}
 
-	// 3. Enviar el usuario recién creado como respuesta
+	// Enviar el usuario recién creado como respuesta
 	c.JSON(201, nuevoUsuario)
 }
 
@@ -95,4 +118,26 @@ func EliminarUsuario(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"mensaje": "Usuario eliminado correctamente"})
+}
+
+func Login(c *gin.Context) {
+	var loginDTO dto.LoginRequest
+
+	// Leer JSON y convertirlo a LoginRequest
+	if err := c.ShouldBindJSON(&loginDTO); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Datos de login inválidos: " + err.Error()})
+		return
+	}
+
+	// Autenticar el usuario (Se enlaza con el service de usuario)
+	usuario, err := service.AutenticarUsuario(database.DB, loginDTO.Email, loginDTO.Contrasena)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Enviar respuesta con usuario autenticado
+	c.JSON(http.StatusOK, gin.H{
+		"usuario": usuario,
+	})
 }
