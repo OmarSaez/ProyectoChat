@@ -142,7 +142,7 @@ func Login(c *gin.Context) {
 	})
 }
 
-func BuscarNombre(c *gin.Context) {
+func BuscarNombreUsuario(c *gin.Context) {
 	nombre := c.Param("nombre")
 	patron := "%" + nombre + "%" // busca el nombre en cualquier parte del string
 
@@ -154,6 +154,26 @@ func BuscarNombre(c *gin.Context) {
 
 	if result.Error != nil {
 		c.JSON(500, gin.H{"error": "No se encontraron usuarios"})
+		return
+	}
+
+	c.JSON(200, buscarUsuario)
+}
+
+func BuscarIdUsuario(c *gin.Context) {
+	id := c.Param("id")
+
+	var buscarUsuario models.Usuario
+
+	result := database.DB.First(&buscarUsuario, id)
+
+	if result.RowsAffected == 0 {
+		c.JSON(404, gin.H{"error": "Usuario no encontrado"})
+		return
+	}
+
+	if result.Error != nil {
+		c.JSON(500, gin.H{"error": "Error al consultar la base de datos"})
 		return
 	}
 
