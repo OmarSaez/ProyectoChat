@@ -44,7 +44,7 @@ func CrearUsuario(c *gin.Context) {
 		c.JSON(400, gin.H{"error": "Error: " + err.Error()}) // Se detiene la creacion y se indica error
 		return
 	} else {
-		fmt.Println("Correo válida")
+		fmt.Println("Correo valido")
 	}
 
 	// Verifico que la contrasena sea valida
