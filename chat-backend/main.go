@@ -29,6 +29,7 @@ func main() {
 	routes.MensajeRouter(api)
 	routes.ChatUsuarioRouter(api)
 	routes.GrupoMiembroRouter(api)
+	routes.ContactoRouter(api)
 
 	r.Run(":8080") // Servidor en localhost:8080
 }
